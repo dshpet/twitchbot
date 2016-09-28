@@ -17,10 +17,19 @@ class TwitchChat:
   chan = "#zersp"
   nick = "kappa_robot"
   pswd = "oauth:qdxk45u28g1qsx8rmnnacf2qgj9whb"
+  commands = {}
   
   def __init__(self):
     self.irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     self.connect(self.host, self.port, self.chan, self.nick)
+    self.init_commands()
+    
+  # todo move to separate entity
+  def init_commands(self):
+      self.commands = {
+        '!help': self.command_help,
+        '!bot': self.command_kappa
+      }
 
   def send(self, message):
     self.irc.send(str_to_byte('PRIVMSG ' + self.chan + ' :' + message + '\r\n'))
@@ -67,19 +76,22 @@ class TwitchChat:
 
     command = message.split(' ')[0] # first 
     if command in self.commands:
-      self.commands[command](self)
+      self.commands[command]()
 
   def command_kappa(self):
     self.send("Kappa")
 
-  commands = {
-    '!Kappa': command_kappa
-  }
+  def command_help(self):
+    commands_string = "I recognize this commands for now: "
+    for command, action in self.commands.items():
+      commands_string = commands_string + command + " "
+  
+    self.send(commands_string)
     
     
   
 twitch = TwitchChat()
-twitch.send("fuck")
+twitch.send("I AM ALIVE!!!!")
 
 
 data = ""
@@ -97,7 +109,7 @@ while True:
         break
 
       if line[0] == 'PING':
-        twitch.pong()
+        twitch.pong('PONGERONI BACK')
         print('PONGERONI')
 
       if line[1] == 'PRIVMSG':
@@ -105,7 +117,7 @@ while True:
         message = twitch.get_message(line)
         twitch.do_command(line)        
 
-        twitch.send('hey, fuck you ' + sender)
+        #twitch.send('hey, fuck you ' + sender)
 
   except socket.error:
     print("socket error")
