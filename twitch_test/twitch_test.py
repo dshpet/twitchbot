@@ -3,6 +3,10 @@ import socket
 import sys
 import re
 from operator import methodcaller
+from urllib import request
+from bs4 import BeautifulSoup
+from random import choice
+import json
 
 encoding = 'UTF-8'
 def str_to_byte(str):
@@ -28,7 +32,11 @@ class TwitchChat:
   def init_commands(self):
       self.commands = {
         '!help': self.command_help,
-        '!bot': self.command_kappa
+        '!bot': self.command_kappa,
+        '!pasta' : self.command_random_pasta,
+        '!ascii' : self.command_ascii,
+        '!face' : self.command_donger_face,
+        '!myemote' : self.random_emote
       }
 
   def send(self, message):
@@ -76,20 +84,56 @@ class TwitchChat:
 
     command = message.split(' ')[0] # first 
     if command in self.commands:
-      self.commands[command]()
+      self.commands[command](sender)
 
   def command_kappa(self):
     self.send("Kappa")
 
-  def command_help(self):
-    commands_string = "I recognize this commands for now: "
+  def command_help(self, sender):
+    commands_string = "I recognize these commands for now: "
     for command, action in self.commands.items():
       commands_string = commands_string + command + " "
   
     self.send(commands_string)
-    
-    
-  
+
+  def command_random_pasta(self, sender):
+    pasta_site = request.urlopen("http://www.twitchquotes.com/random") # ty for pastas bois
+    pasta_doc = pasta_site.read()
+    soup = BeautifulSoup(pasta_doc, 'html.parser')
+    real_pasta = soup.find(id="quote_content_1")
+    pasta_text = str(real_pasta.contents[0]) # i don't like it but for simple purposes it works
+    self.send(pasta_text)
+
+  def command_ascii(self, sender):
+    pasta_site = request.urlopen("http://www.twitchquotes.com/copypastas/ascii-art") # ᕕ( ՞ ᗜ ՞ )ᕗ
+    pasta_doc = pasta_site.read()
+    soup = BeautifulSoup(pasta_doc, 'html.parser')
+    all_links = soup.find_all('a', {"class":"ascii_preview_link"})
+
+    ascii_site = request.urlopen("http://www.twitchquotes.com/" + choice(all_links).attrs['href'])
+    ascii_doc = ascii_site.read()
+    ascii_soup = BeautifulSoup(ascii_doc, 'html.parser')
+    art = ascii_soup.find(id = 'quote_content_0')
+    self.send(art.contents[0])
+
+  def command_donger_face(self, sender):
+    url = "http://textfac.es"
+    req = request.Request(url, headers={'User-Agent' : "Magic Browser"}) # blockers DansGame
+    pasta_site = request.urlopen(req)
+    pasta_doc = pasta_site.read()
+    soup = BeautifulSoup(pasta_doc, 'html.parser')
+    faces = soup.find_all('button', {"class":"facebtn"})
+    face = choice(faces).attrs['data-clipboard-text']
+    self.send(face)
+
+  def random_emote(self, sender):
+    url = "https://twitchemotes.com/api_cache/v2/global.json"
+    response = request.urlopen(url).read()
+    parsed = json.loads(response.decode('utf-8'))
+    global_emotes = list(parsed['emotes'].keys())
+    random_emote = choice(global_emotes)
+    self.send("You are a " + random_emote + ", @" + sender)    
+ 
 twitch = TwitchChat()
 twitch.send("I AM ALIVE!!!!")
 
