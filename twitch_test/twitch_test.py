@@ -86,7 +86,7 @@ class TwitchChat:
     if command in self.commands:
       self.commands[command](sender)
 
-  def command_kappa(self):
+  def command_kappa(self, sender):
     self.send("Kappa")
 
   def command_help(self, sender):
@@ -105,7 +105,7 @@ class TwitchChat:
     self.send(pasta_text)
 
   def command_ascii(self, sender):
-    pasta_site = request.urlopen("http://www.twitchquotes.com/copypastas/ascii-art") # ᕕ( ՞ ᗜ ՞ )ᕗ
+    pasta_site = request.urlopen("http://www.twitchquotes.com/copypastas/ascii-art")
     pasta_doc = pasta_site.read()
     soup = BeautifulSoup(pasta_doc, 'html.parser')
     all_links = soup.find_all('a', {"class":"ascii_preview_link"})

@@ -12,6 +12,8 @@
     <OutputPath>.</OutputPath>
     <Name>twitch_test</Name>
     <RootNamespace>twitch_test</RootNamespace>
+    <InterpreterId>{4c9b6ce7-0cfd-498c-a95d-bd701ef352a4}</InterpreterId>
+    <InterpreterVersion>3.5</InterpreterVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -26,6 +28,9 @@
     <Compile Include="working_example.py">
       <SubType>Code</SubType>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="{4c9b6ce7-0cfd-498c-a95d-bd701ef352a4}\3.5" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
