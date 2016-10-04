@@ -4,13 +4,14 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>e4e05fdc-9bfc-4953-9751-59462efc64dc</ProjectGuid>
-    <ProjectHome>.</ProjectHome>
-    <StartupFile>twitch_test.py</StartupFile>
+    <ProjectHome>
+    </ProjectHome>
+    <StartupFile>main.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>twitch_test</Name>
+    <Name>twitch_bot</Name>
     <RootNamespace>twitch_test</RootNamespace>
     <InterpreterId>{9a7a9026-48c1-4688-9d5d-e5699d47d074}</InterpreterId>
     <InterpreterVersion>3.5</InterpreterVersion>
@@ -24,10 +25,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="twitch_test.py" />
-    <Compile Include="working_example.py">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="main.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="{9a7a9026-48c1-4688-9d5d-e5699d47d074}\3.5" />
