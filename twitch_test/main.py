@@ -100,6 +100,8 @@ while True:
         sender = twitch.get_sender(line)
         message = twitch.get_message(line)
         twitch.do_command(line)
+        # todo chatterbot
+        # http://chatterbot.readthedocs.io/en/stable/
 
   except socket.error:
     print("socket error")
