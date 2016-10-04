@@ -2,11 +2,16 @@
 import socket
 import sys
 import re
+import json
+import numpy as np
+from io import BytesIO
 from operator import methodcaller
 from urllib import request
 from bs4 import BeautifulSoup
 from random import choice
-import json
+from PIL import Image
+from PIL import ImageFilter
+from bisect import bisect
 
 encoding = 'UTF-8'
 def str_to_byte(str):
@@ -132,7 +137,29 @@ class TwitchChat:
     parsed = json.loads(response.decode('utf-8'))
     global_emotes = list(parsed['emotes'].keys())
     random_emote = choice(global_emotes)
-    self.send("You are a " + random_emote + ", @" + sender)    
+    self.send("You are a " + random_emote + ", @" + sender)
+
+
+  # resize fails, maybe fix later
+  def command_image_to_ascii(self):
+    chars = np.asarray(list(' .,:;irsXA253hMHGS#9B&@'))
+    
+    url = "http://i.imgur.com/ohipiQX.jpg"
+    imageFile = BytesIO(request.urlopen(url).read())
+
+    SC, GCF, WCF = float(1000), float(1000), 7/4
+    
+    img = Image.open(imageFile)
+    
+    #img.mode = 'I'
+    #img = img.point(lambda i:i*(1./256)).convert('L').filter(ImageFilter.BLUR)
+
+    S = ( round(img.size[0]*SC*WCF), round(img.size[1]*SC) )
+    img = np.sum( np.asarray( img.resize(S) ), axis=2)
+    img -= img.min()
+    img = (1.0 - img/img.max())**GCF*(chars.size-1)
+    
+    print( "\n".join( ("".join(r) for r in chars[img.astype(int)]) ) )
  
 twitch = TwitchChat()
 twitch.send("I AM ALIVE!!!!")
