@@ -25,10 +25,34 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="commands\AsciiArt.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="commands\BaseCommand.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="commands\CommandsList.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="commands\DongerFace.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="commands\Help.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="commands\RandomPasta.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="commands\TwitchEmote.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="main.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="{9a7a9026-48c1-4688-9d5d-e5699d47d074}\3.5" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="commands\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

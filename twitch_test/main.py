@@ -1,17 +1,8 @@
-# import irc
+#!usr/bin/env/python
+
 import socket
-import sys
 import re
-import json
-import numpy as np
-from io import BytesIO
 from operator import methodcaller
-from urllib import request
-from bs4 import BeautifulSoup
-from random import choice
-from PIL import Image
-from PIL import ImageFilter
-from bisect import bisect
 
 encoding = 'UTF-8'
 def str_to_byte(str):
@@ -19,30 +10,16 @@ def str_to_byte(str):
 
 class TwitchChat:
   
-  # Kappa
   irc = socket.socket()
   host = "irc.twitch.tv"
   port = 6667
   chan = "#zersp"
   nick = "kappa_robot"
   pswd = "oauth:qdxk45u28g1qsx8rmnnacf2qgj9whb"
-  commands = {}
   
   def __init__(self):
     self.irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     self.connect(self.host, self.port, self.chan, self.nick)
-    self.init_commands()
-    
-  # todo move to separate entity
-  def init_commands(self):
-      self.commands = {
-        '!help': self.command_help,
-        '!bot': self.command_kappa,
-        '!pasta' : self.command_random_pasta,
-        '!ascii' : self.command_ascii,
-        '!face' : self.command_donger_face,
-        '!myemote' : self.random_emote
-      }
 
   def send(self, message):
     self.irc.send(str_to_byte('PRIVMSG ' + self.chan + ' :' + message + '\r\n'))
@@ -88,82 +65,13 @@ class TwitchChat:
       return
 
     command = message.split(' ')[0] # first 
-    if command in self.commands:
-      self.commands[command](sender)
 
-  def command_kappa(self, sender):
-    self.send("Kappa")
-
-  def command_help(self, sender):
-    commands_string = "I recognize these commands for now: "
-    for command, action in self.commands.items():
-      commands_string = commands_string + command + " "
-  
-    self.send(commands_string)
-
-  def command_random_pasta(self, sender):
-    pasta_site = request.urlopen("http://www.twitchquotes.com/random") # ty for pastas bois
-    pasta_doc = pasta_site.read()
-    soup = BeautifulSoup(pasta_doc, 'html.parser')
-    real_pasta = soup.find(id="quote_content_1")
-    pasta_text = str(real_pasta.contents[0]) # i don't like it but for simple purposes it works
-    self.send(pasta_text)
-
-  def command_ascii(self, sender):
-    pasta_site = request.urlopen("http://www.twitchquotes.com/copypastas/ascii-art")
-    pasta_doc = pasta_site.read()
-    soup = BeautifulSoup(pasta_doc, 'html.parser')
-    all_links = soup.find_all('a', {"class":"ascii_preview_link"})
-
-    ascii_site = request.urlopen("http://www.twitchquotes.com/" + choice(all_links).attrs['href'])
-    ascii_doc = ascii_site.read()
-    ascii_soup = BeautifulSoup(ascii_doc, 'html.parser')
-    art = ascii_soup.find(id = 'quote_content_0')
-    self.send(art.contents[0])
-
-  def command_donger_face(self, sender):
-    url = "http://textfac.es"
-    req = request.Request(url, headers={'User-Agent' : "Magic Browser"}) # blockers DansGame
-    pasta_site = request.urlopen(req)
-    pasta_doc = pasta_site.read()
-    soup = BeautifulSoup(pasta_doc, 'html.parser')
-    faces = soup.find_all('button', {"class":"facebtn"})
-    face = choice(faces).attrs['data-clipboard-text']
-    self.send(face)
-
-  def random_emote(self, sender):
-    url = "https://twitchemotes.com/api_cache/v2/global.json"
-    response = request.urlopen(url).read()
-    parsed = json.loads(response.decode('utf-8'))
-    global_emotes = list(parsed['emotes'].keys())
-    random_emote = choice(global_emotes)
-    self.send("You are a " + random_emote + ", @" + sender)
-
-
-  # resize fails, maybe fix later
-  def command_image_to_ascii(self):
-    chars = np.asarray(list(' .,:;irsXA253hMHGS#9B&@'))
-    
-    url = "http://i.imgur.com/ohipiQX.jpg"
-    imageFile = BytesIO(request.urlopen(url).read())
-
-    SC, GCF, WCF = float(1000), float(1000), 7/4
-    
-    img = Image.open(imageFile)
-    
-    #img.mode = 'I'
-    #img = img.point(lambda i:i*(1./256)).convert('L').filter(ImageFilter.BLUR)
-
-    S = ( round(img.size[0]*SC*WCF), round(img.size[1]*SC) )
-    img = np.sum( np.asarray( img.resize(S) ), axis=2)
-    img -= img.min()
-    img = (1.0 - img/img.max())**GCF*(chars.size-1)
-    
-    print( "\n".join( ("".join(r) for r in chars[img.astype(int)]) ) )
+    from commands.CommandsList import commands
+    if command in commands:
+      self.send(commands[command].respond(message, sender))
  
 twitch = TwitchChat()
 twitch.send("I AM ALIVE!!!!")
-
 
 data = ""
 while True:
