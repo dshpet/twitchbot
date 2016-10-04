@@ -46,6 +46,10 @@ class TwitchChat:
     self.send_nick()
     self.join_channel(self.chan)
 
+  # twitch does not support it
+  def whois(self, nick):
+    self.irc.send(str_to_byte('WHOIS ' + nick + '\r\n'))
+
   # getters
   def get_sender(self, line):
     message = line[0]
@@ -87,6 +91,7 @@ while True:
       if len(line) == 0:
         break
 
+      print(line)
       if line[0] == 'PING':
         twitch.pong('PONGERONI BACK')
         print('PONGERONI')
@@ -94,9 +99,7 @@ while True:
       if line[1] == 'PRIVMSG':
         sender = twitch.get_sender(line)
         message = twitch.get_message(line)
-        twitch.do_command(line)        
-
-        #twitch.send('hey, fuck you ' + sender)
+        twitch.do_command(line)
 
   except socket.error:
     print("socket error")
