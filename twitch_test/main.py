@@ -3,6 +3,7 @@
 import socket
 import re
 from operator import methodcaller
+import chatterbot
 
 encoding = 'UTF-8'
 def str_to_byte(str):
@@ -16,10 +17,28 @@ class TwitchChat:
   chan = "#zersp"
   nick = "kappa_robot"
   pswd = "oauth:qdxk45u28g1qsx8rmnnacf2qgj9whb"
+  chat_bot = None
   
   def __init__(self):
     self.irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     self.connect(self.host, self.port, self.chan, self.nick)
+    
+    self.chat_bot = chatterbot.ChatBot(
+      "KappaRobot", 
+      storage_adapter="chatterbot.adapters.storage.JsonFileStorageAdapter",
+      logic_adapters=[
+        "chatterbot.adapters.logic.MathematicalEvaluation",
+        "chatterbot.adapters.logic.TimeLogicAdapter",
+        "chatterbot.adapters.logic.ClosestMatchAdapter",
+      ]
+    )
+
+    self.chat_bot.set_trainer(chatterbot.trainers.ChatterBotCorpusTrainer)
+    self.chat_bot.train("chatterbot.corpus.english")
+
+  #
+  # IRC Commands
+  #
 
   def send(self, message):
     self.irc.send(str_to_byte('PRIVMSG ' + self.chan + ' :' + message + '\r\n'))
@@ -58,13 +77,13 @@ class TwitchChat:
 
   def get_message(self, line):
     message = line[3][1:]
+    for i in range(4, len(line)):
+      message = message + " " + line[i]
+
     return message
 
   # commands and analyzers
-  def do_command(self, line):
-    message = self.get_message(line)
-    sender = self.get_sender(line)
-
+  def do_command(self, message, sender):
     if message[0] != '!':
       return
 
@@ -73,9 +92,16 @@ class TwitchChat:
     from commands.CommandsList import commands
     if command in commands:
       self.send(commands[command].respond(message, sender))
+
+  def bot_process_message(self, message, sender):
+    message = re.sub('@kappa_robot', '', message) # remove name for sentence sanity
+    message = re.sub(r"\s+", " ", message, flags=re.UNICODE) # remove whitespaces
+    response = self.chat_bot.get_response(message)    
+    
+    self.send(response.text + ", @" + sender)
  
 twitch = TwitchChat()
-twitch.send("I AM ALIVE!!!!")
+twitch.send("I AM ALIVE!!!")
 
 data = ""
 while True:
@@ -99,9 +125,10 @@ while True:
       if line[1] == 'PRIVMSG':
         sender = twitch.get_sender(line)
         message = twitch.get_message(line)
-        twitch.do_command(line)
-        # todo chatterbot
-        # http://chatterbot.readthedocs.io/en/stable/
+        twitch.do_command(message, sender)
+
+        if ("@kappa_robot" in message):
+          twitch.bot_process_message(message, sender)
 
   except socket.error:
     print("socket error")

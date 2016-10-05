@@ -10,3 +10,5 @@ bs4
 random
 PIL
 bisect
+chatterbot
+python-Levenshtein
