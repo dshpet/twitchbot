@@ -1,4 +1,3 @@
-#from .AbstractChatBot import AbstractChatBot
 from AbstractChatBot import AbstractChatBot
 
 import socket
@@ -6,6 +5,7 @@ import re
 from operator import methodcaller
 import chatterbot
 
+# helper util
 encoding = 'UTF-8'
 def str_to_byte(str):
   return bytes(str, encoding)
@@ -35,8 +35,8 @@ class TwitchBot(AbstractChatBot):
       ]
     )
 
-    self.chat_bot.set_trainer(chatterbot.trainers.ChatterBotCorpusTrainer)
-    self.chat_bot.train("chatterbot.corpus.english")
+    #self.chat_bot.set_trainer(chatterbot.trainers.ChatterBotCorpusTrainer)
+    #self.chat_bot.train("chatterbot.corpus.english")
 
   #
   # IRC Commands
@@ -136,5 +136,3 @@ class TwitchBot(AbstractChatBot):
     
       except socket.timeout:
         print("socket timeout")
-
-
