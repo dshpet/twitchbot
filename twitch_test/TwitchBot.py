@@ -25,13 +25,14 @@ class TwitchBot(AbstractChatBot):
     self.irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     self.connect(self.host, self.port, self.chan, self.nick)
     
+    # TODO revisit bot config
     self.chat_bot = chatterbot.ChatBot(
       "KappaRobot", 
-      storage_adapter="chatterbot.adapters.storage.JsonFileStorageAdapter",
+      storage_adapter="chatterbot.storage.JsonFileStorageAdapter",
       logic_adapters=[
-        "chatterbot.adapters.logic.MathematicalEvaluation",
-        "chatterbot.adapters.logic.TimeLogicAdapter",
-        "chatterbot.adapters.logic.ClosestMatchAdapter",
+        "chatterbot.logic.MathematicalEvaluation",
+        "chatterbot.logic.TimeLogicAdapter",
+        "chatterbot.logic.ClosestMatchAdapter",
       ]
     )
 
