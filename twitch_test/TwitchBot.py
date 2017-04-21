@@ -13,8 +13,10 @@ IS_LEARNING_ENABLED = False
 
 # Utils TODO move to separate file
 
-# Returns byte represenation to send through the network
 encoding = 'UTF-8'
+endl     = "\r\n"
+
+# Returns byte represenation to send through the network
 def str_to_byte(str):
   return bytes(str, encoding)
 
@@ -34,7 +36,6 @@ class TwitchBot(AbstractChatBot):
   nick            = "kappa_robot"
   twitch_auth_key = b'\x9aA:\x8a!\xf0\x9e\xf5\xbc(\xc2\x0e\xf0Q\xe3\x87\xe4\xca1#\n\x94\x04ho\xc2d\x15\xc9Q\x99\x82,h\x18\xd7\xa7\x00\xa4,E\xffE\xab\x17B+\x8f'
   mongo_auth_key  = b'G\xcd-\x94\x18\xc9\xf2\xc2\x97\xdcS-`\xbaM<x\x9f\xb1S\xf2\xe7\x13&\xdc\x19\xfa\xc1\x98\x1f\x81\x94\x15J\xc7\xaf\xf1}\xc7<\xfe\x9a7*<\x1e\x8dL\xef\xa1\x1b\xf1k\x96\xf4\x82\xe7\xcaY\t\xa0\xe8+um&\xcd\xcb\xb7\xf0\xd4N\xf7\x98\x86^\xe6\xf0\xd8D'
-  endl            = "\r\n"
 
   #
   # Members
