@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from .BaseCommand import BaseCommand
 from urllib import request
 from bs4 import BeautifulSoup
@@ -5,9 +8,6 @@ from random import choice
 
 class AsciiArt(BaseCommand):
     """Gets a random donger face from selected web"""
-
-    def perfrom(self, message, sender):
-      raise RuntimeError("Not implemented")
 
     def respond(self, message, sender):
       url = "http://www.twitchquotes.com/copypastas/ascii-art"
@@ -25,4 +25,3 @@ class AsciiArt(BaseCommand):
 
     def __str__(self, **kwargs):
       return "Wanna see a fancy donger? Type me"
-

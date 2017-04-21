@@ -1,10 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from .BaseCommand import BaseCommand
 
 class Help(BaseCommand):
     """basic help message for a chat user"""
-
-    def perfrom(self, message, sender):
-      raise RuntimeError("Not implemented")
 
     def respond(self, message, sender):
       from .CommandsList import commands

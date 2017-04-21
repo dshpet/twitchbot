@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from .BaseCommand import BaseCommand
 from urllib import request
 from bs4 import BeautifulSoup
@@ -6,9 +9,6 @@ import json
 
 class TwitchEmote(BaseCommand):
     """Gets a random twitch emote from twitchemotes api"""
-
-    def perfrom(self, message, sender):
-      raise RuntimeError("Not implemented")
 
     def respond(self, message, sender):
       url = "https://twitchemotes.com/api_cache/v2/global.json"
@@ -21,4 +21,3 @@ class TwitchEmote(BaseCommand):
 
     def __str__(self, **kwargs):
       return "Wanna who you are? NO FAKE TWITCH TEST"
-
