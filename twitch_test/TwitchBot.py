@@ -30,7 +30,7 @@ class TwitchBot(AbstractChatBot):
   # Config
   #
 
-  host            = "irc.twitch.tv"
+  host            = "irc.chat.twitch.tv"
   port            = 6667
   chan            = "#zersp"
   nick            = "kappa_robot"

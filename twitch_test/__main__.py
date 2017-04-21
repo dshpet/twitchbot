@@ -2,7 +2,11 @@
 # -*- coding: utf-8 -*-
 
 def main():
-  from TwitchBot import TwitchBot 
+  from TwitchBot import TwitchBot
+  from commands.Wikipedia import Wikipedia
+
+  wiki = Wikipedia()
+  wiki.respond("ololo", "zersp")
 
   twitch = TwitchBot()
   twitch.send_message("I AM ALIVE!!!")

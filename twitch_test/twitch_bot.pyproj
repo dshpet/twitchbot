@@ -49,6 +49,9 @@
     <Compile Include="commands\TwitchEmote.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="commands\Wikipedia.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="TwitchBot.py">
       <SubType>Code</SubType>
     </Compile>
