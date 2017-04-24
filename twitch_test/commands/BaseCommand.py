@@ -17,3 +17,5 @@ class BaseCommand():
     """
     def __str__(self, **kwargs):
       raise RuntimeError("Not implemented")
+
+    __repr__ = __str__
