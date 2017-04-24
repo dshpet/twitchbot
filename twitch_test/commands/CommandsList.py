@@ -6,11 +6,13 @@ from .DongerFace import DongerFace
 from .RandomPasta import RandomPasta
 from .AsciiArt import AsciiArt
 from .TwitchEmote import TwitchEmote
+from .Wikipedia import Wikipedia
 
 commands = {
   '!help'    : Help(),
   '!pasta'   : RandomPasta(),
   '!ascii'   : AsciiArt(),
   '!face'    : DongerFace(),
-  '!myemote' : TwitchEmote()
+  '!myemote' : TwitchEmote(),
+  '!wiki'    : Wikipedia()
 }
