@@ -14,7 +14,9 @@ class Help(BaseCommand):
       for name, command in commands.items():
         commands_string = commands_string + " " + name
 
-      return commands_string
+      advanced_usage = ". Use [!help topic] to get more info on command. Example: !help wiki"
+      
+      return commands_string + advanced_usage
 
     # kinda retarded function signature
     def help_on_topic(self, topics_list):
