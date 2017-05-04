@@ -10,8 +10,8 @@ from .Wikipedia import Wikipedia
 
 commands = {
   '!help'    : Help(),
-  '!pasta'   : RandomPasta(),
-  '!ascii'   : AsciiArt(),
+  #'!pasta'   : RandomPasta(),
+  #'!ascii'   : AsciiArt(),
   '!face'    : DongerFace(),
   '!myemote' : TwitchEmote(),
   '!wiki'    : Wikipedia()

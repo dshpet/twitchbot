@@ -1,6 +1,3 @@
-socket
-sys
-re
 json
 numpy
 io
