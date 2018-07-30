@@ -6,7 +6,6 @@ def main():
   from commands.Wikipedia import Wikipedia
 
   twitch = TwitchBot()
-  twitch.send_message("I AM ALIVE!!!")
   twitch.start()
 
 if __name__ == "__main__":

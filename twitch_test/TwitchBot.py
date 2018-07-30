@@ -32,8 +32,8 @@ class TwitchBot(AbstractChatBot):
 
   host            = "irc.chat.twitch.tv"
   port            = 6667
-  chan            = "#zersp"
-  nick            = "kappa_robot"
+  channel         = "#gorgc"
+  nickname        = "kappa_robot"
   twitch_auth_key = b'\x9aA:\x8a!\xf0\x9e\xf5\xbc(\xc2\x0e\xf0Q\xe3\x87\xe4\xca1#\n\x94\x04ho\xc2d\x15\xc9Q\x99\x82,h\x18\xd7\xa7\x00\xa4,E\xffE\xab\x17B+\x8f'
   mongo_auth_key  = b'G\xcd-\x94\x18\xc9\xf2\xc2\x97\xdcS-`\xbaM<x\x9f\xb1S\xf2\xe7\x13&\xdc\x19\xfa\xc1\x98\x1f\x81\x94\x15J\xc7\xaf\xf1}\xc7<\xfe\x9a7*<\x1e\x8dL\xef\xa1\x1b\xf1k\x96\xf4\x82\xe7\xcaY\t\xa0\xe8+um&\xcd\xcb\xb7\xf0\xd4N\xf7\x98\x86^\xe6\xf0\xd8D'
 
@@ -60,7 +60,7 @@ class TwitchBot(AbstractChatBot):
     self.decrypt_access_keys()
 
     self.irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    self.connect(self.host, self.port, self.chan, self.nick)
+    self.connect(self.host, self.port, self.channel, self.nickname)
     
     self.chat_bot = chatterbot.ChatBot(
       name            = "KappaRobot", 
@@ -111,13 +111,13 @@ class TwitchBot(AbstractChatBot):
   #
 
   def send_message(self, message):
-    self.irc.send(str_to_byte('PRIVMSG ' + self.chan + ' :' + message + endl))
+    self.irc.send(str_to_byte('PRIVMSG ' + self.channel + ' :' + message + endl))
 
   def send_pass(self):
     self.irc.send(str_to_byte('PASS ' + self.twitch_auth_key + endl))
 
   def send_nick(self):
-    self.irc.send(str_to_byte('NICK ' + self.nick + endl))
+    self.irc.send(str_to_byte('NICK ' + self.nickname + endl))
 
   def join_channel(self, channel):
     self.irc.send(str_to_byte('JOIN ' + channel + endl))
@@ -133,7 +133,7 @@ class TwitchBot(AbstractChatBot):
     self.irc.connect((server, self.port))
     self.send_pass()
     self.send_nick()
-    self.join_channel(self.chan)
+    self.join_channel(self.channel)
 
   # getters
   def get_sender(self, line):
@@ -149,8 +149,7 @@ class TwitchBot(AbstractChatBot):
     return message
 
   # commands and analyzers
-  def process_message(self, message):    
-   print(message)
+  def process_message(self, message):
 
    if message[0] == 'PING':
      self.pong('PONGERONI BACK')
@@ -159,10 +158,12 @@ class TwitchBot(AbstractChatBot):
    if message[1] == 'PRIVMSG':
      sender = self.get_sender(message)
      message_text = self.get_message(message)
+
+     print(sender + ":" + message_text)
      
      self.do_command(message_text, sender)
    
-     if (("@" + self.nick) in message_text):
+     if (("@" + self.nickname) in message_text):
        self.bot_process_message(message_text, sender)
 
   def do_command(self, message, sender):
@@ -176,7 +177,7 @@ class TwitchBot(AbstractChatBot):
       self.send_message(commands[command].respond(message, sender))
 
   def bot_process_message(self, message, sender):
-    message = re.sub(("@" + self.nick), '', message) # remove name for sentence sanity
+    message = re.sub(("@" + self.nickname), '', message) # remove name for sentence sanity
     message = re.sub(r"\s+", " ", message, flags=re.UNICODE) # remove whitespaces
     response = self.chat_bot.get_response(message)    
     
@@ -199,8 +200,11 @@ class TwitchBot(AbstractChatBot):
     
           self.process_message(line)
     
-      except socket.error:
-        print("socket error")
+      except socket.error as e:
+        print("socket error " + str(e))
     
-      except socket.timeout:
-        print("socket timeout")
+      except socket.timeout as e:
+        print("socket timeout " + str(e))
+
+      except Exception as e:
+        print(str(e))
