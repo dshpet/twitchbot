@@ -7,6 +7,8 @@ def main():
 
   twitch = TwitchBot()
   twitch.start()
+  while True:
+    twitch.update()
 
 if __name__ == "__main__":
   main()

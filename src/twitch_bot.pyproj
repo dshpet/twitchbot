@@ -24,9 +24,6 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AbstractChatBot.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="commands\AsciiArt.py">
       <SubType>Code</SubType>
     </Compile>
@@ -54,10 +51,14 @@
     <Compile Include="TwitchBot.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="utils\StringUtils.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="__main__.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="commands\" />
+    <Folder Include="utils\" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|ContinuumAnalytics|Anaconda36-64" />
