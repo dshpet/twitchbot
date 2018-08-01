@@ -27,7 +27,7 @@ class TwitchBot():
 
   host            = "irc.chat.twitch.tv"
   port            = 6667
-  channel         = "#zersp"
+  channel         = "#zersp" # todo remove '#'
   nickname        = "kappa_robot"
   twitch_auth_key = b'\x9aA:\x8a!\xf0\x9e\xf5\xbc(\xc2\x0e\xf0Q\xe3\x87\xe4\xca1#\n\x94\x04ho\xc2d\x15\xc9Q\x99\x82,h\x18\xd7\xa7\x00\xa4,E\xffE\xab\x17B+\x8f'
   mongo_auth_key  = b'G\xcd-\x94\x18\xc9\xf2\xc2\x97\xdcS-`\xbaM<x\x9f\xb1S\xf2\xe7\x13&\xdc\x19\xfa\xc1\x98\x1f\x81\x94\x15J\xc7\xaf\xf1}\xc7<\xfe\x9a7*<\x1e\x8dL\xef\xa1\x1b\xf1k\x96\xf4\x82\xe7\xcaY\t\xa0\xe8+um&\xcd\xcb\xb7\xf0\xd4N\xf7\x98\x86^\xe6\xf0\xd8D'
@@ -84,6 +84,23 @@ class TwitchBot():
   def pong(self, message):
     self.irc.send(StringUtils.str_to_byte('PONG ' + message + StringUtils.endl))
 
+  def get_users(self):
+    from urllib import request
+    import json
+    url = 'http://tmi.twitch.tv/group/user/' + 'zersp' + '/chatters' # todo setup channel
+    response = request.urlopen(url).read()
+    parsed = json.loads(response.decode('utf-8'))
+    chatters = parsed['chatters']
+
+    admins      = chatters['admins']
+    global_mods = chatters['global_mods']
+    moderators  = chatters['moderators']    
+    staff       = chatters['staff']
+    viewers     = chatters['viewers']
+    all_viewers = admins + global_mods + moderators + staff + viewers
+    
+    return all_viewers
+
   def connect(self, server, port, channel, botnick):
     print("connecting to: " + server + ":" + str(port))
     self.irc.connect((server, self.port))
@@ -119,7 +136,7 @@ class TwitchBot():
       self.send_message(commands[command].respond(message, sender))
 
   def generate_random_message(self): # todo rethink
-    random_viewer = 'zersp' # todo
+    random_viewer = random.choice(self.get_users())
     from commands.CommandsList import commands # remove help
     random_command = random.choice(list(commands.keys())) # uuuuh
     self.send_message(commands[random_command].respond("ololo", random_viewer))
@@ -150,5 +167,5 @@ class TwitchBot():
     self.receive_data()
     self.process_messages()
 
-    if random.randint(0, 100) < 69:
-      self.generate_random_message()
+    #if random.randint(0, 100) < 69:
+    self.generate_random_message() # todo check why is not called sometimes
