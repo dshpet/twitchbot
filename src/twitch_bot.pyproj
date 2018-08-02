@@ -51,6 +51,9 @@
     <Compile Include="TwitchBot.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="IRCClient.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="utils\StringUtils.py">
       <SubType>Code</SubType>
     </Compile>

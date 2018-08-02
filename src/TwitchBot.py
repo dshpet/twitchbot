@@ -5,6 +5,8 @@ import socket
 import re
 import random
 from operator import methodcaller
+import threading
+import asyncio
 
 # todo this
 # from twitch import TwitchClient
@@ -18,7 +20,9 @@ from operator import methodcaller
 
 import sys
 sys.path.insert(0, './utils')
+sys.path.insert(0, '.')
 import StringUtils
+import IRCClient
 
 class TwitchBot():
   #
@@ -27,7 +31,7 @@ class TwitchBot():
 
   host            = "irc.chat.twitch.tv"
   port            = 6667
-  channel         = "#zersp" # todo remove '#'
+  channel         = "zersp"
   nickname        = "kappa_robot"
   twitch_auth_key = b'\x9aA:\x8a!\xf0\x9e\xf5\xbc(\xc2\x0e\xf0Q\xe3\x87\xe4\xca1#\n\x94\x04ho\xc2d\x15\xc9Q\x99\x82,h\x18\xd7\xa7\x00\xa4,E\xffE\xab\x17B+\x8f'
   mongo_auth_key  = b'G\xcd-\x94\x18\xc9\xf2\xc2\x97\xdcS-`\xbaM<x\x9f\xb1S\xf2\xe7\x13&\xdc\x19\xfa\xc1\x98\x1f\x81\x94\x15J\xc7\xaf\xf1}\xc7<\xfe\x9a7*<\x1e\x8dL\xef\xa1\x1b\xf1k\x96\xf4\x82\xe7\xcaY\t\xa0\xe8+um&\xcd\xcb\xb7\xf0\xd4N\xf7\x98\x86^\xe6\xf0\xd8D'
@@ -36,8 +40,10 @@ class TwitchBot():
   # Members
   #
 
-  irc       = socket.socket()
-  chat_data = ""
+  # check for better typename strategy
+  main_loop = asyncio.BaseEventLoop
+  irc       = IRCClient.IRCClient
+  chat_data = str
 
   #
   # Initialization
@@ -55,34 +61,44 @@ class TwitchBot():
     self.mongo_auth_key  = str(crypter.decrypt(self.mongo_auth_key ).strip())[2:-1] # crop unnecessary braces and stuff
 
   def start(self):
-    self.irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    self.connect(self.host, self.port, self.channel, self.nickname)
+    self.irc = IRCClient.IRCClient(self.channel, self.nickname, self.twitch_auth_key, self.host, self.port)
+
+    self.main_loop = asyncio.get_event_loop()
     self.chat_data = ""
 
     print("Started successfully")
+
+    # todo
+    # asyncio.ensure_future(self.receive_data())
+    # asyncio.ensure_future(self.process_messages())
+    # self.main_loop.run_forever()
 
   #
   # IRC Commands
   #
 
   # todo move
-  def send_message(self, message):
+  def send_message(self, message : str) -> None:
     self.irc.send(StringUtils.str_to_byte('PRIVMSG ' + self.channel + ' :' + message + StringUtils.endl))
 
-  def send_pass(self):
+  def send_pass(self) -> None:
     self.irc.send(StringUtils.str_to_byte('PASS ' + self.twitch_auth_key + StringUtils.endl))
 
-  def send_nick(self):
+  def send_nick(self) -> None:
     self.irc.send(StringUtils.str_to_byte('NICK ' + self.nickname + StringUtils.endl))
 
-  def join_channel(self, channel):
+  def join_channel(self, channel : str) -> None:
     self.irc.send(StringUtils.str_to_byte('JOIN ' + channel + StringUtils.endl))
 
-  def part_channel(self, channel):
+  def part_channel(self, channel : str) -> None:
     self.irc.send(StringUtils.str_to_byte('PART ' + channel + StringUtils.endl))
 
-  def pong(self, message):
+  def pong(self, message : str) -> None:
     self.irc.send(StringUtils.str_to_byte('PONG ' + message + StringUtils.endl))
+
+  # needs some rework as it stops receiving data when chat is not moving
+  async def get_data(self) -> str:
+    return await self.irc.recv(1024).decode(StringUtils.main_encoding)
 
   def get_users(self):
     from urllib import request
@@ -136,20 +152,22 @@ class TwitchBot():
       self.send_message(commands[command].respond(message, sender))
 
   def generate_random_message(self): # todo rethink
+    print("generate_random_message")
     random_viewer = random.choice(self.get_users())
     from commands.CommandsList import commands # remove help
     random_command = random.choice(list(commands.keys())) # uuuuh
     self.send_message(commands[random_command].respond("ololo", random_viewer))
     
 
-  def receive_data(self):
+  async def receive_data(self):
     try:
-      self.chat_data = self.chat_data + self.irc.recv(1024).decode(StringUtils.main_encoding)
+      new_data = await self.get_data()
+      self.chat_data = self.chat_data + new_data
 
     except Exception as e:
       print(str(e))
   
-  def process_messages(self):
+  async def process_messages(self):
     data_split = re.split(r"[~\r\n]+", self.chat_data)    
     for line in data_split:
       line = str.strip(line)
@@ -163,9 +181,13 @@ class TwitchBot():
     self.chat_data = ""
 
   def update(self):
+    pass
+    # print("update")
     # todo monitor load between receiving and processing
-    self.receive_data()
-    self.process_messages()
+    # self.receive_data()
+    # self.process_messages()
 
     #if random.randint(0, 100) < 69:
-    self.generate_random_message() # todo check why is not called sometimes
+    # print("before message generation")
+    # # self.generate_random_message() # todo check why is not called sometimes
+    # print("after message generation")
