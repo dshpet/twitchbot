@@ -9,10 +9,10 @@ from .TwitchEmote import TwitchEmote
 from .Wikipedia import Wikipedia
 
 commands = {
-  '!help'    : Help(),
+  #'!help'    : Help(),
   #'!pasta'   : RandomPasta(),
   #'!ascii'   : AsciiArt(),
-  '!face'    : DongerFace(),
+  #'!face'    : DongerFace(),
   '!myemote' : TwitchEmote(),
-  '!wiki'    : Wikipedia()
+  #'!wiki'    : Wikipedia()
 }

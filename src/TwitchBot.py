@@ -51,6 +51,7 @@ class TwitchBot():
 
   def __init__(self):
     self.decrypt_access_keys()
+    self.chat_data = ""
 
   def decrypt_access_keys(self):
     from Crypto.Cipher import AES
@@ -62,75 +63,15 @@ class TwitchBot():
 
   def start(self):
     self.irc = IRCClient.IRCClient(self.channel, self.nickname, self.twitch_auth_key, self.host, self.port)
-
-    self.main_loop = asyncio.get_event_loop()
-    self.chat_data = ""
-
     print("Started successfully")
-
-    # todo
-    # asyncio.ensure_future(self.receive_data())
-    # asyncio.ensure_future(self.process_messages())
-    # self.main_loop.run_forever()
-
-  #
-  # IRC Commands
-  #
-
-  # todo move
-  def send_message(self, message : str) -> None:
-    self.irc.send(StringUtils.str_to_byte('PRIVMSG ' + self.channel + ' :' + message + StringUtils.endl))
-
-  def send_pass(self) -> None:
-    self.irc.send(StringUtils.str_to_byte('PASS ' + self.twitch_auth_key + StringUtils.endl))
-
-  def send_nick(self) -> None:
-    self.irc.send(StringUtils.str_to_byte('NICK ' + self.nickname + StringUtils.endl))
-
-  def join_channel(self, channel : str) -> None:
-    self.irc.send(StringUtils.str_to_byte('JOIN ' + channel + StringUtils.endl))
-
-  def part_channel(self, channel : str) -> None:
-    self.irc.send(StringUtils.str_to_byte('PART ' + channel + StringUtils.endl))
-
-  def pong(self, message : str) -> None:
-    self.irc.send(StringUtils.str_to_byte('PONG ' + message + StringUtils.endl))
-
-  # needs some rework as it stops receiving data when chat is not moving
-  async def get_data(self) -> str:
-    return await self.irc.recv(1024).decode(StringUtils.main_encoding)
-
-  def get_users(self):
-    from urllib import request
-    import json
-    url = 'http://tmi.twitch.tv/group/user/' + 'zersp' + '/chatters' # todo setup channel
-    response = request.urlopen(url).read()
-    parsed = json.loads(response.decode('utf-8'))
-    chatters = parsed['chatters']
-
-    admins      = chatters['admins']
-    global_mods = chatters['global_mods']
-    moderators  = chatters['moderators']    
-    staff       = chatters['staff']
-    viewers     = chatters['viewers']
-    all_viewers = admins + global_mods + moderators + staff + viewers
-    
-    return all_viewers
-
-  def connect(self, server, port, channel, botnick):
-    print("connecting to: " + server + ":" + str(port))
-    self.irc.connect((server, self.port))
-    self.send_pass()
-    self.send_nick()
-    self.join_channel(self.channel)
 
   #
   # Commands/Analyzers
   #
 
   def process_message(self, message):
-   if message[0] == 'PING':
-     self.pong('PONGERONI BACK')
+   if message[0] == 'PING': # todo move and return only meaningful data
+     self.irc.pong('PONGERONI BACK')
      print('PONGERONI')
    
    if message[1] == 'PRIVMSG':
@@ -157,17 +98,17 @@ class TwitchBot():
     from commands.CommandsList import commands # remove help
     random_command = random.choice(list(commands.keys())) # uuuuh
     self.send_message(commands[random_command].respond("ololo", random_viewer))
-    
 
-  async def receive_data(self):
+  def receive_data(self): # todo maybe move to IRC
     try:
-      new_data = await self.get_data()
-      self.chat_data = self.chat_data + new_data
+      self.chat_data = self.chat_data + self.irc.get_data()
+      if (self.chat_data is not ""):
+        print(self.chat_data)
 
     except Exception as e:
       print(str(e))
   
-  async def process_messages(self):
+  def process_messages(self): # todo maybe separate with IRC
     data_split = re.split(r"[~\r\n]+", self.chat_data)    
     for line in data_split:
       line = str.strip(line)
@@ -181,11 +122,9 @@ class TwitchBot():
     self.chat_data = ""
 
   def update(self):
-    pass
-    # print("update")
-    # todo monitor load between receiving and processing
-    # self.receive_data()
-    # self.process_messages()
+    # todo async
+    self.receive_data()
+    self.process_messages()
 
     #if random.randint(0, 100) < 69:
     # print("before message generation")
